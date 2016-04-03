@@ -276,29 +276,316 @@ HERE BE DRAGONS
 
 # La M del MVC
 
-## Unidirectional data flow
-## Flux
-## Redux
+* Unidirectional data flow
+* Flux
+* Redux
 
 --
 
-# HERE BE A LOT OF DRAGONS
+# Code cartoons by Lin Clark
 
-* Diagrama de Uniderectional data flow
+https://code-cartoons.com
 
-* Diagrama de flux
+* Flux  
+https://code-cartoons.com/a-cartoon-guide-to-flux-6157355ab207#.h6ouot9mo
+* Redux  
+https://code-cartoons.com/a-cartoon-intro-to-redux-3afb775501a6#.p0w2c76yg
+* Hot reload and time travel debugging  
+https://code-cartoons.com/hot-reloading-and-time-travel-debugging-what-are-they-3c8ed2812f35#.w2wvn5e9a
 
+-- image
+
+# Unidirectional data flow
+
+![Unidirectional data flow](./assets/unidirectional-data-flow.png)
+
+-- image
+
+# Flux
+
+![Flux](./assets/flux.png)
+
+https://facebook.github.io/flux/
+
+--
+TODO
 * Why redux? Hot reload, time travel development, tools
 
-* Diagrama redux.
+--
 
-* Ejemplo sin react con una acción, reducer y action creator. suscribe a la store y console log del estado nuevo.
+# Redux: Flux alike
 
-* Ampliar el ejemplo con 2 acciones y un combine reducers
+![Unidirectional data flow](./assets/unidirectional-data-flow.png)
+
+--
+
+# Redux: principios
+
+>**Single source of truth**
+>
+>The state of your whole application is stored in an object tree within a single store.
+>
+>** State is read-only**
+>
+>The only way to mutate the state is to emit an action, an object describing what happened.
+>
+>**Changes are made with pure functions**
+>
+>To specify how the state tree is transformed by actions, you write pure reducers.
+
+--
+
+# Funciones puras e impuras
+
+```javascript
+// Pure function
+
+const double = (x) => {
+  return 2 * x;
+}
+
+// Impure function
+const double = (x) => {
+  const result =  2 * x;
+  storeDoubledNumbers(x, result) // side effect
+  return result;
+}
+
+const storeDoubledNumbers(number, double) {
+  fetch("/store_doubled_numbers.json", {
+    method: "POST",
+    body: JSON.stringify({
+      number,
+      double
+    })
+  );
+}
+```
+
+--
+
+# Redux
+
+* Objeto estado único e inmutable
+* Reducer: `f(state, action) = state'`
+* `store = state +  reducers`
+* `store.dispatch(action)`
+
+--
+
+# Actions
+
+```javascript
+const ADD_TODO = "ADD_TODO";
+```
+
+```javascript
+{
+  type: ADD_TODO,
+  text: "Follow the leader, leader, leader"
+}
+```
+
+--
+
+# Action creators
+
+```javascript
+function addTodo(text) {
+  return {
+    type: ADD_TODO,
+    text
+  }
+}
+```
+
+--
+
+# Reducers
+
+```javascript
+const initialState = {
+  todos: []
+}
+
+export default function todosReducer(state = initialState, action) {
+
+  switch(action.type) {
+    case ADD_TODO: {
+      return {
+        todos: [...todos, action.text ]
+      }
+    default:
+      return state;
+  }
+}
+```
+
+
+--
+
+# Store
+
+```javascript
+import { createStore } from "redux";
+import todosReducer from "./reducers";
+
+const store = createStore(todosReducer);
+
+cont unsuscribe = store.suscribe(() => {
+  console.log(store.getState());
+});
+
+store.dispatch(addTodo("Explain the code"));
+store.dispatch(addTodo("Explain the code oonce more"));
+
+```
+--
+
+# Actions
+
+
+```javascript
+const ADD_TODO = "ADD_TODO";
+const REMOVE_TODO = "REMOVE_TODO";
+const ADD_REMINDER = "ADD_REMINDER";
+```
+
+```javascript
+{
+  type: ADD_TODO,
+  text: "Follow the leader, leader, leader"
+}
+
+{
+  type: REMOVE_TODO,
+  position: 1
+}
+
+{
+  type: ADD_REMINDER,
+  text: "Do not forget to follow the leader"
+}
+```
+
+--
+
+# Action creators
+
+```javascript
+function addTodo(text) {
+  return {
+    type: ADD_TODO,
+    text
+  }
+}
+
+function removeTodo(position) {
+  return {
+    type: REMOVE_TODO,
+    position
+  }
+}
+
+function addReminder(text) {
+  return {
+    type: ADD_REMINDER,
+    text
+  }
+}
+```
+
+--
+
+# Reducers
+
+
+```javascript
+import { combineReducers } from 'redux';
+
+const initialState = {
+  todos: [],
+  reminders: []
+}
+
+function todosReducer(state = initialState.todos, action) {
+
+  switch(action.type) {
+    case ADD_TODO:
+      return {
+        todos: [...todos, action.text ]
+      }
+
+    case REMOVE_TODO:
+      return {
+        todos: [
+          ...todos.slice(0, action.position), 
+          ...todos.slice(action.position + 1)
+        ]
+      }
+
+    default:
+      return state;
+  }
+}
+```
+
+--
+
+# Reducers
+
+```javascript
+function remidersReducer(state = initialState.reminders, action) {
+  switch(action.type) {
+    case ADD_REMINDER:
+      return {
+        reminders: [...reminders, action.text ]
+      }
+
+    default:
+      return state;
+  }
+}
+
+export default appReducer = combineReduceres(
+  todos: todosReducer,
+  reminders: remidersReducer
+);
+
+```
+
+--
+
+# Store
+
+```javascript
+import { createStore } from "redux";
+import appReducer from "./reducers";
+
+const store = createStore(apReducer);
+
+cont unsuscribe = store.suscribe(() => {
+  console.log(store.getState());
+});
+
+store.dispatch(addTodo("Explain the code"));
+store.dispatch(addTodo("Explain the code oonce more"));
+store.dispatch(removeTodo(1));
+
+store.dispatch(addReminder("Don't forget the code"));
+
+```
+
+--
+
+
+# HERE BE A LOT OF DRAGONS
 
 * Enganche con React. Componentes de vista. Componentes connectados. ¿Hacerlo a piñon vs connect?
 
+--
 
+# LIVE DEMO
 
 -- image
 
