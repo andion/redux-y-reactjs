@@ -1,48 +1,316 @@
+
 <!DOCTYPE html>
 <html>
   <head>
-    <!--
-      OK, name your slides:
-    -->
-    <title>SlidePack template</title>
+    <title>React an Redux</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!--
-    Ubuntu font FTW. Remove this comment to use it (if present, SlidePack will
-    use this font for headings).
-
-    <link href='http://fonts.googleapis.com/css?family=Ubuntu:400,700,400italic' rel='stylesheet' type='text/css'>
-    -->
-
-    <!-- SlidePack basic stylesheets and theme -->
     <link rel="stylesheet" type="text/css" href="slide-pack.min.css">
+
+    <style>
+
+     #custom section {
+       justify-content: inherit;
+       padding-top: 5%;
+     }
+
+     #custom ul {
+       list-style-position: outside;
+     }
+
+     #custom .cover {
+       padding-top: 0;
+       justify-content: center;
+       background: #0074D9;
+       align-items: flex-start;
+       text-align: left;
+     }
+
+     #custom .cover h1 {
+       color: #fff;
+       font-size: 250%;
+       font-weight: 700;
+       margin-left: calc(50% - 2em);
+     }
+
+     #custom .who,
+     #custom .slidepack {
+       padding-top: 0;
+       justify-content: center;
+     }
+
+     #custom .who strong {
+       font-size: 120%;
+     }
+
+     #custom .who p {
+        text-align: center;
+     }
+
+     #custom .disclaimer {
+       align-items: center;
+       padding-top: 0;
+       background: #00BB6D;
+       justify-content: center;
+     }
+
+     #custom .disclaimer h1 {
+       font-weight: 700;
+     }
+
+     #custom .disclaimer * {
+       color: #fff;
+     }
+
+     #custom .warning {
+        background: red;
+     }
+
+     #custom .image {
+       background: #fff;
+     }
+
+     #custom .hljs-comment {
+      color: #FFD300 ! important;
+    }
+    </style>
   </head>
-  <body>
+  <body id="custom">
 
 <textarea data-slide-pack>
 
+-- cover
+
+# React<br/>Redux
+
+
+-- who
+
+**David Barral**  
+david@trabesoluciones.com  
+@davidbarral
+
+**Román Coedo**  
+roman@trabesoluciones.com  
+@rcoedo
+
+**Asís García**  
+asis@trabsoluciones.com  
+@asischao
+
+-- slidepack
+
+## Esta charla está hecha con
+
+# SlidePack
+
+## _"Simple slides generator & viewer"_
+
+[trabe.github.io/slide-pack](http://trabe.github.io/slide-pack)
+
+
+-- disclaimer
+
+## En capítulos anteriores
+
+# ES6<br/>Babel<br/>React
+
 --
 
-# FRONTPAGE
+# OBJETIVOS
+
+## Repaso a React
+## La M del MVC
+## Introducir Redux
 
 --
 
-# First slide
+![](./assets/react.png)
 
-Write your stuff using markdown.
-
---
-
-# Second slide
+https://facebook.github.io/react/
 
 --
 
-# etc.
+# React
+
+## Filosofía
+
+* Librería de UI
+* UI = f(estado)
+* Virtual DOM
+* Uniderectional data flow
 
 --
 
-# FIN
+# Componentes
+
+```javascript
+import React from "react";
+import {render} from "react-dom";
+
+const HelloWorld = () => <p>Hello world!</p>;
+
+render(
+  <HelloWorld/>,
+  document.getElementById("app")
+);
+
+```
+--
+
+# What the &amp;lt;Fuck/&amp;gt; !?
+## JSX (syntactic sugar)
+
+--
+
+# Props
+
+```javascript
+import React from "react";
+import {render} from "react-dom";
+
+const HelloWorld = (props) => <p>Hello {props.name}!</p>;
+
+render(
+  <HelloWorld name="John"/>,
+  document.getElementById("app")
+);
+
+```
+--
+
+# Funciones vs clases
+
+```javascript
+import React from "react";
+import {render} from "react-dom";
+
+class HelloWorld extends React.Component {
+  render() {
+    return <p>Hello {this.props.name}!</p>;
+  }
+}
+
+render(
+  <HelloWorld name="John"/>,
+  document.getElementById("app")
+);
+
+```
+
+--
+
+# Estado y eventos
+
+```javascript
+class HelloWorld extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { casual: props.casual };
+    this.toggleStyle = this.toggleStyle.bind(this);
+  }
+
+  toggleStyle() {
+    this.setState({ casual: !this.state.casual });
+  }
+
+  render() {
+    const greeting = this.state.casual ? "Wasap" : "Hello";
+    return <p onClick={this.toggleStyle}>{greeting} {this.props.name}!</p>;
+  }
+}
+
+render(
+  <HelloWorld name="John" casual={false}/>,
+  document.getElementById("app")
+);
+
+```
+--
+
+# Children
+
+```javascript
+const Emphasis = ({children}) => {
+  return (
+    <div>
+      WOOOOOOOOWWWWW!!!
+      {children}
+      WWAAAAAAAWWWAAAAAAAAAA!!!
+    </div>
+  );
+}
+
+render(
+  <Emphasis>
+    <HelloWorld name="John" casual={false}/>
+  </Emphasis>,
+  document.getElementById("app")
+);
+
+```
+
+--
+
+# Otros temas
+
+* Ciclo de vida
+* JSX quirks
+* propTypes
+* Contexto
+
+--
+
+# propTypes
+
+HERE BE DRAGONS
+
+--
+
+# Contexto
+
+HERE BE DRAGONS
+
+--
+
+# La M del MVC
+
+## Unidirectional data flow
+## Flux
+## Redux
+
+--
+
+# HERE BE A LOT OF DRAGONS
+
+* Diagrama de Uniderectional data flow
+
+* Diagrama de flux
+
+* Why redux? Hot reload, time travel development, tools
+
+* Diagrama redux.
+
+* Ejemplo sin react con una acción, reducer y action creator. suscribe a la store y console log del estado nuevo.
+
+* Ampliar el ejemplo con 2 acciones y un combine reducers
+
+* Enganche con React. Componentes de vista. Componentes connectados. ¿Hacerlo a piñon vs connect?
+
+
+
+-- image
+
+# ¿Preguntas?
+
+![](./assets/questions.jpg)
+
+--
+
+# ¡Hasta el próximo capítulo!
+
+![](./assets/gunter.gif)
 
 </textarea>
 
