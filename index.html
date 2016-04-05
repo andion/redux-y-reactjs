@@ -72,8 +72,18 @@
      }
 
      #custom .hljs-comment {
-      color: #FFD300 ! important;
-    }
+       color: #FFD300 ! important;
+     }
+
+     #custom .quoting {
+       background: #000;
+       color: #aaa;
+     }
+
+     #custom .quoting h1,
+     #custom strong {
+       color: #eee;
+     }
     </style>
   </head>
   <body id="custom">
@@ -201,8 +211,7 @@ render(
 
 --
 
-# Estado y eventos
-
+# [Estado y eventos](http://jsbin.com/dixitubaco/embed?js,output)
 ```javascript
 class HelloWorld extends React.Component {
   constructor(props) {
@@ -262,15 +271,81 @@ render(
 
 --
 
-# propTypes
+# Inmutabilidad
 
-HERE BE DRAGONS
+```javascript
+
+function addToArray(array, element) {
+  return [...array, element];
+}
+
+function removeFromArray(array, position) {
+  return [...array.slice(0, position), ...array.slice(position + 1)];
+}
+
+const array1 = [1,2,3,4];
+const array2 = addToArray(array1, 5);  // [1,2,3,4,5]
+const array3 = removeFromArray(array2, 4);  // [1,2,3,4]
+
+array1 === array3 // false
+
+```
 
 --
 
-# Contexto
+# Inmutabilidad
 
-HERE BE DRAGONS
+```javascript
+
+const john = {
+  name: "John",
+  age: 27,
+}
+
+
+function becomeOlder(person) {
+  return {
+    ...person,
+    age: person.age + 1
+  }
+}
+
+const olderJohn = becomeOlder(john);
+
+john.age // 27
+olderJohn.age // 28
+john === olderJohn // false
+
+```
+
+--
+
+# Funciones puras e impuras
+
+```javascript
+// Pure function
+
+const double = (x) => {
+  return 2 * x;
+}
+
+// Impure function
+const double = (x) => {
+  const result =  2 * x;
+  storeDoubledNumbers(x, result) // side effect
+  return result;
+}
+
+const storeDoubledNumbers(number, double) {
+  fetch("/store_doubled_numbers.json", {
+    method: "POST",
+    body: JSON.stringify({
+      number,
+      double
+    })
+  );
+}
+```
 
 --
 
@@ -308,16 +383,21 @@ https://code-cartoons.com/hot-reloading-and-time-travel-debugging-what-are-they-
 https://facebook.github.io/flux/
 
 --
-TODO
-* Why redux? Hot reload, time travel development, tools
+
+# Estado compartido
+
+>>>> diagrama que muestre el estado compartido (cómo se va moviendo hacia el padre)
 
 --
 
-# Redux: Flux alike
+# ¿Por qué Redux?
 
-![Unidirectional data flow](./assets/unidirectional-data-flow.png)
+* Gestionar el cambio de estado de manera centralizada
+* Hot reloading sin perder el estado
+* Time-travel development
 
---
+
+-- quoting
 
 # Redux: principios
 
@@ -335,32 +415,9 @@ TODO
 
 --
 
-# Funciones puras e impuras
+# Redux: Flux alike
 
-```javascript
-// Pure function
-
-const double = (x) => {
-  return 2 * x;
-}
-
-// Impure function
-const double = (x) => {
-  const result =  2 * x;
-  storeDoubledNumbers(x, result) // side effect
-  return result;
-}
-
-const storeDoubledNumbers(number, double) {
-  fetch("/store_doubled_numbers.json", {
-    method: "POST",
-    body: JSON.stringify({
-      number,
-      double
-    })
-  );
-}
-```
+![Unidirectional data flow](./assets/redux-flow.png)
 
 --
 
@@ -373,29 +430,21 @@ const storeDoubledNumbers(number, double) {
 
 --
 
-# Actions
+# Actions y Action Creators
 
 ```javascript
 const ADD_TODO = "ADD_TODO";
-```
 
-```javascript
-{
-  type: ADD_TODO,
-  text: "Follow the leader, leader, leader"
-}
-```
+// {
+//   type: ADD_TODO,
+//   text: "Follow the leader, leader, leader"
+// }
 
---
-
-# Action creators
-
-```javascript
 function addTodo(text) {
   return {
     type: ADD_TODO,
     text
-  }
+  };
 }
 ```
 
@@ -404,17 +453,18 @@ function addTodo(text) {
 # Reducers
 
 ```javascript
-const initialState = {
-  todos: []
-}
+const initialState = [];
 
-export default function todosReducer(state = initialState, action) {
+export default function todosReducer(state, action) {
+
+  if (typeof state === "undefined") {
+    return state;
+  }
 
   switch(action.type) {
     case ADD_TODO: {
-      return {
-        todos: [...todos, action.text ]
-      }
+      return [...state, action.text ];
+
     default:
       return state;
   }
@@ -424,7 +474,7 @@ export default function todosReducer(state = initialState, action) {
 
 --
 
-# Store
+# [Store](http://jsbin.com/vabivaluxu/1/edit?js,console)
 
 ```javascript
 import { createStore } from "redux";
@@ -432,7 +482,7 @@ import todosReducer from "./reducers";
 
 const store = createStore(todosReducer);
 
-cont unsuscribe = store.suscribe(() => {
+const unsubscribe = store.subscribe(() => {
   console.log(store.getState());
 });
 
@@ -440,6 +490,7 @@ store.dispatch(addTodo("Explain the code"));
 store.dispatch(addTodo("Explain the code oonce more"));
 
 ```
+
 --
 
 # Actions
@@ -477,21 +528,21 @@ function addTodo(text) {
   return {
     type: ADD_TODO,
     text
-  }
+  };
 }
 
 function removeTodo(position) {
   return {
     type: REMOVE_TODO,
     position
-  }
+  };
 }
 
 function addReminder(text) {
   return {
     type: ADD_REMINDER,
     text
-  }
+  };
 }
 ```
 
@@ -508,24 +559,20 @@ const initialState = {
   reminders: []
 }
 
-function todosReducer(state = initialState.todos, action) {
+function todosReducer(todos = initialState.todos, action) {
 
   switch(action.type) {
     case ADD_TODO:
-      return {
-        todos: [...todos, action.text ]
-      }
+      return [...todos, action.text ];
 
     case REMOVE_TODO:
-      return {
-        todos: [
-          ...todos.slice(0, action.position), 
-          ...todos.slice(action.position + 1)
-        ]
-      }
+      return [
+        ...todos.slice(0, action.position),
+        ...todos.slice(action.position + 1)
+      ];
 
     default:
-      return state;
+      return todos;
   }
 }
 ```
@@ -535,28 +582,26 @@ function todosReducer(state = initialState.todos, action) {
 # Reducers
 
 ```javascript
-function remidersReducer(state = initialState.reminders, action) {
+function remidersReducer(reminders = initialState.reminders, action) {
   switch(action.type) {
     case ADD_REMINDER:
-      return {
-        reminders: [...reminders, action.text ]
-      }
+      return [...reminders, action.text ];
 
     default:
-      return state;
+      return reminders;
   }
 }
 
-export default appReducer = combineReduceres(
+export default appReducer = combineReducers({
   todos: todosReducer,
   reminders: remidersReducer
-);
+});
 
 ```
 
 --
 
-# Store
+# [Store](http://jsbin.com/tujonisuji/edit?js,console)
 
 ```javascript
 import { createStore } from "redux";
@@ -564,14 +609,13 @@ import appReducer from "./reducers";
 
 const store = createStore(apReducer);
 
-cont unsuscribe = store.suscribe(() => {
+cont unsubscribe = store.subscribe(() => {
   console.log(store.getState());
 });
 
 store.dispatch(addTodo("Explain the code"));
 store.dispatch(addTodo("Explain the code oonce more"));
 store.dispatch(removeTodo(1));
-
 store.dispatch(addReminder("Don't forget the code"));
 
 ```
