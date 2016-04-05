@@ -84,6 +84,19 @@
      #custom strong {
        color: #eee;
      }
+
+     #custom .demo {
+       align-items: center;
+       padding-top: 0;
+       background: #000;
+       justify-content: center;
+     }
+
+     #custom .demo h1 {
+       font-weight: 700;
+       color: #FFF;
+     }
+
     </style>
   </head>
   <body id="custom">
@@ -386,7 +399,31 @@ https://facebook.github.io/flux/
 
 # Estado compartido
 
->>>> diagrama que muestre el estado compartido (cómo se va moviendo hacia el padre)
+![Estado compartido](./assets/state1.png)
+
+--
+
+# Estado compartido
+
+![Estado compartido](./assets/state2.png)
+
+--
+
+# Estado compartido
+
+![Estado compartido](./assets/state3.png)
+
+--
+
+# Estado compartido
+
+![Estado compartido](./assets/state4.png)
+
+--
+
+# Estado compartido
+
+![Estado compartido](./assets/state5.png)
 
 --
 
@@ -500,23 +537,21 @@ store.dispatch(addTodo("Explain the code oonce more"));
 const ADD_TODO = "ADD_TODO";
 const REMOVE_TODO = "REMOVE_TODO";
 const ADD_REMINDER = "ADD_REMINDER";
-```
 
-```javascript
-{
-  type: ADD_TODO,
-  text: "Follow the leader, leader, leader"
-}
-
-{
-  type: REMOVE_TODO,
-  position: 1
-}
-
-{
-  type: ADD_REMINDER,
-  text: "Do not forget to follow the leader"
-}
+// {
+//   type: ADD_TODO,
+//   text: "Follow the leader, leader, leader"
+// }
+//
+// {
+//   type: REMOVE_TODO,
+//   position: 1
+// }
+//
+// {
+//   type: ADD_REMINDER,
+//   text: "Do not forget to follow the leader"
+// }
 ```
 
 --
@@ -552,7 +587,7 @@ function addReminder(text) {
 
 
 ```javascript
-import { combineReducers } from 'redux';
+import { combineReducers } from "redux";
 
 const initialState = {
   todos: [],
@@ -563,7 +598,7 @@ function todosReducer(todos = initialState.todos, action) {
 
   switch(action.type) {
     case ADD_TODO:
-      return [...todos, action.text ];
+      return [...todos, action.text];
 
     case REMOVE_TODO:
       return [
@@ -592,7 +627,7 @@ function remidersReducer(reminders = initialState.reminders, action) {
   }
 }
 
-export default appReducer = combineReducers({
+export default combineReducers({
   todos: todosReducer,
   reminders: remidersReducer
 });
@@ -601,7 +636,7 @@ export default appReducer = combineReducers({
 
 --
 
-# [Store](http://jsbin.com/tujonisuji/edit?js,console)
+# [Store](http://jsbin.com/lixuqohabe/edit?js,console)
 
 ```javascript
 import { createStore } from "redux";
@@ -622,12 +657,92 @@ store.dispatch(addReminder("Don't forget the code"));
 
 --
 
+# React and Redux
 
-# HERE BE A LOT OF DRAGONS
-
-* Enganche con React. Componentes de vista. Componentes connectados. ¿Hacerlo a piñon vs connect?
+* Componentes de vista
+  * Sólo renderizan UI
+  * API vía `props`
+* Componentes conectados
+  * Agregan componentes de vista
+  * Pasan `props` (estado) y eventos a sus `children`
+  * Cogen la `store` del contexto
 
 --
+
+# Componentes de vista
+
+```javascript
+
+import React from "react";
+
+const Todo = ({text, onClick}) =>
+  <li><a href="#" onClick={onClick}>{text}</a></li>;
+
+
+const Todos = ({todos, onTodoClick}) => {
+
+  const todoItems = todos.map((todo, i) =>
+    <Todo key={i}
+          text={todo}
+          onClick=(e) => {
+            event.preventDefault();
+            onTodoClick(i);
+          }/>
+  );
+
+  return <ul>{todoItems}</ul>;
+}
+
+```
+--
+
+# Componentes contenedores
+
+```javascript
+
+export default connect(
+  state => ({
+    todos: state.todos
+  }),
+  dispatch => ({
+    onTodoClick: position => { dispatch(removeTodo(position)) }
+  })
+)(Todos);
+
+```
+
+--
+
+# [Redux: provider](http://jsbin.com/piqifaropi/1/edit?js,output)
+
+```javascript
+import React from "react";
+import { render } from "react-dom";
+import { Provider } from "react-redux";
+import { createStore } from "redux";
+import appReducer from "./reducers";
+import Todos from "./todos";
+
+const store = createStore(appReducer);
+
+render(
+  <Provider store={store}>
+    <Todos />
+  </Provider>,
+  document.getElementById("root")
+);
+
+```
+
+--
+
+# Efectos laterales
+
+* redux-thunk
+* redux-saga
+* redux-loop
+
+-- demo
 
 # LIVE DEMO
 
