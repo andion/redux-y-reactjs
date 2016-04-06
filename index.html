@@ -337,7 +337,6 @@ john === olderJohn // false
 
 ```javascript
 // Pure function
-
 const double = (x) => {
   return 2 * x;
 }
@@ -657,15 +656,16 @@ store.dispatch(addReminder("Don't forget the code"));
 
 --
 
-# React and Redux
+# React y Redux
 
 * Componentes de vista
   * Sólo renderizan UI
   * API vía `props`
 * Componentes conectados
   * Agregan componentes de vista
-  * Pasan `props` (estado) y eventos a sus `children`
-  * Cogen la `store` del contexto
+  * Acceden a la `store` a través del contexto
+  * Acceden al estado de la `store`
+  * Pasan `props` (estado) y _callbacks_ a sus `children`
 
 --
 
